@@ -273,8 +273,27 @@ const ClientProjectsDashboard = () => {
     },
     'Personal Projects': {
       type: 'Individual Client Work',
-      urgency: 'low',
+      urgency: 'medium',
       projects: [
+        {
+          id: 'claude-debug-capture',
+          title: 'Claude Debug Capture Extension',
+          status: 'planning',
+          priority: 'High',
+          description: 'Chrome extension for one-click screenshot + console logs + Railway logs capture, optimized for Claude Code workflow',
+          lastUpdate: '2025-08-15',
+          hasClaudeProject: true,
+          claudeProjectName: 'Claude Debug Capture Extension',
+          tasks: [
+            { id: 't40', text: 'Design Chrome extension architecture (manifest.json, popup, background)', completed: false },
+            { id: 't41', text: 'Implement core capture functionality (screenshot + console logs)', completed: false },
+            { id: 't42', text: 'Integrate Railway CLI wrapper for deployment logs', completed: false },
+            { id: 't43', text: 'Build Claude-optimized markdown output formatter', completed: false },
+            { id: 't44', text: 'Add to dashboard repo as /chrome-extension folder', completed: false },
+            { id: 't45', text: 'Test extension with real debugging scenario', completed: false },
+            { id: 't46', text: 'Deploy and document usage workflow', completed: false }
+          ]
+        },
         {
           id: 'keisha-sodium',
           title: 'Keisha Holmes - Sodium Conversion Guide',
