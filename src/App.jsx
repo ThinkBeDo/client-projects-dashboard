@@ -427,11 +427,20 @@ ${updateText}
     return matchesSearch;
   });
 
-  const totalProjects = Object.values(clients).reduce((acc, client) => acc + client.projects.length, 0);
+  // Calculate active project metrics (urgent, in-progress, planning, research)
+  const activeProjects = Object.values(clients).reduce((acc, client) => 
+    acc + client.projects.filter(p => ['urgent', 'in-progress', 'planning', 'research'].includes(p.status)).length, 0);
+  
   const urgentProjects = Object.values(clients).reduce((acc, client) => 
     acc + client.projects.filter(p => p.status === 'urgent').length, 0);
-  const activeProjects = Object.values(clients).reduce((acc, client) => 
+  
+  const inProgressProjects = Object.values(clients).reduce((acc, client) => 
     acc + client.projects.filter(p => p.status === 'in-progress').length, 0);
+  
+  // Calculate clients with active projects
+  const activeClients = Object.values(clients).filter(client => 
+    client.projects.some(p => ['urgent', 'in-progress', 'planning', 'research'].includes(p.status))
+  ).length;
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
@@ -445,8 +454,8 @@ ${updateText}
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Total Projects</p>
-                <p className="text-2xl font-bold text-gray-900">{totalProjects}</p>
+                <p className="text-sm text-gray-500">Active Projects</p>
+                <p className="text-2xl font-bold text-gray-900">{activeProjects}</p>
               </div>
               <Building2 className="w-8 h-8 text-blue-500" />
             </div>
@@ -463,8 +472,8 @@ ${updateText}
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Active</p>
-                <p className="text-2xl font-bold text-blue-600">{activeProjects}</p>
+                <p className="text-sm text-gray-500">In Progress</p>
+                <p className="text-2xl font-bold text-blue-600">{inProgressProjects}</p>
               </div>
               <Clock className="w-8 h-8 text-blue-500" />
             </div>
@@ -472,8 +481,8 @@ ${updateText}
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Clients</p>
-                <p className="text-2xl font-bold text-gray-900">{Object.keys(clients).length}</p>
+                <p className="text-sm text-gray-500">Active Clients</p>
+                <p className="text-2xl font-bold text-gray-900">{activeClients}</p>
               </div>
               <User className="w-8 h-8 text-green-500" />
             </div>
