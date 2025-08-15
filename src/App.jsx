@@ -12,6 +12,29 @@ const ClientProjectsDashboard = () => {
 
   // Client data organized by business
   const clients = {
+    'Demetri Kofinas - Hidden Forces Podcast': {
+      type: 'Media/Podcast',
+      contact: 'Demetri Kofinas',
+      urgency: 'medium',
+      projects: [
+        {
+          id: 'demetri-booking-agents',
+          title: 'Smart Podcast Guest Booking System',
+          status: 'active',
+          priority: 'medium',
+          timeline: '2-3 weeks',
+          description: '4-Agent system: Email Discovery, Smart Prioritization, Relationship Mapping, Outreach Automation',
+          lastUpdate: '2024-08-15',
+          updates: [
+            '✅ Agent 1 (Email Discovery) built and ready for demo',
+            '✅ Technical clarifications sent to client',
+            '🔄 Waiting for client response to schedule call',
+            '📋 Planning: 4-factor ranking system (Star Power, Newsworthiness, Quality, Eloquence)',
+            '🚀 Feature idea: Social media connection mapping for warm introductions'
+          ]
+        }
+      ]
+    },
     'Dana Tierney - AIS': {
       type: 'Healthcare/Mammography',
       contact: 'Dana Tierney',
