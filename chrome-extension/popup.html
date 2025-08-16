@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Extension</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h2>🐛 Debug Context Capture</h2>
+            <div class="header-actions">
+                <button id="settingsToggle" class="icon-btn" title="Settings">⚙️</button>
+                <button id="viewHistoryBtn" class="icon-btn" title="View History">📚</button>
+            </div>
+        </div>
+
+        <!-- Main Capture Button -->
+        <div class="main-action">
+            <button id="captureBtn" class="capture-btn">
+                🐛 Capture Debug Context
+            </button>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div id="progressContainer" class="progress-container" style="display: none;">
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <div id="progressText" class="progress-text">Starting capture...</div>
+        </div>
+
+        <!-- Settings Panel -->
+        <div id="settingsPanel" class="panel settings-panel" style="display: none;">
+            <h3>⚙️ Capture Settings</h3>
+            
+            <div class="setting-group">
+                <label class="toggle-label">
+                    <input type="checkbox" id="claudeMode" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">Claude Mode</span>
+                </label>
+                <small>Optimize output for Claude analysis</small>
+            </div>
+
+            <div class="setting-group claude-feature">
+                <label class="toggle-label">
+                    <input type="checkbox" id="memorySave" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">Auto-save to Memory</span>
+                </label>
+                <small>Automatically save captures to basic-memory</small>
+            </div>
+
+            <div class="setting-group claude-feature">
+                <label class="toggle-label">
+                    <input type="checkbox" id="insights" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">Error Pattern Analysis</span>
+                </label>
+                <small>Analyze error patterns and provide insights</small>
+            </div>
+
+            <div class="setting-group">
+                <label class="toggle-label">
+                    <input type="checkbox" id="railwayLogs" checked>
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-text">Railway Logs</span>
+                </label>
+                <small>Capture Railway deployment logs (when applicable)</small>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" class="results-container" style="display: none;">
+            <h3>✅ Capture Complete</h3>
+            
+            <!-- Download Links -->
+            <div class="download-section">
+                <h4>📥 Downloads</h4>
+                <div class="download-links">
+                    <a id="downloadClaude" class="download-btn claude-feature" style="display: none;">
+                        📄 Claude Report
+                    </a>
+                    <a id="downloadRaw" class="download-btn" style="display: none;">
+                        📊 Raw Data (JSON)
+                    </a>
+                    <a id="downloadScreenshot" class="download-btn" style="display: none;">
+                        📸 Screenshot
+                    </a>
+                </div>
+            </div>
+
+            <!-- Memory Status -->
+            <div id="memoryStatus" class="memory-status claude-feature"></div>
+
+            <!-- Claude Preview -->
+            <div id="claudePreview" class="claude-preview claude-feature" style="display: none;"></div>
+
+            <!-- Insights Panel -->
+            <div id="insightsPanel" class="insights-panel claude-feature" style="display: none;"></div>
+        </div>
+
+        <!-- History Panel -->
+        <div id="historyPanel" class="panel history-panel" style="display: none;">
+            <div id="historyList"></div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <small>💡 <strong>Pro tip:</strong> Use Ctrl+Enter for quick capture</small>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
