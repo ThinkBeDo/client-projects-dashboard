@@ -379,22 +379,7 @@ const ClientProjectsDashboard = () => {
     try {
       // Create a comprehensive update note for Claude's memory
       const timestamp = new Date().toLocaleString();
-      const updateNote = `# Project Update - ${selectedProject.title}
-
-**Client**: ${selectedProject.client}
-**Date**: ${timestamp}
-**Updated by**: Dashboard Interface
-
-## Update Details:
-${updateText}
-
-## Current Project Status:
-- **Status**: ${selectedProject.status}
-- **Priority**: ${selectedProject.priority}
-- **Last Update**: ${selectedProject.lastUpdate}
-
----
-*This update was submitted via the Client Projects Dashboard*`;
+      const updateNote = `# Project Update - ${selectedProject.title}\n\n**Client**: ${selectedProject.client}\n**Date**: ${timestamp}\n**Updated by**: Dashboard Interface\n\n## Update Details:\n${updateText}\n\n## Current Project Status:\n- **Status**: ${selectedProject.status}\n- **Priority**: ${selectedProject.priority}\n- **Last Update**: ${selectedProject.lastUpdate}\n\n---\n*This update was submitted via the Client Projects Dashboard*`;
 
       // Log the update for Claude to process
       console.log('PROJECT UPDATE SUBMITTED:', {
@@ -406,12 +391,7 @@ ${updateText}
       });
 
       // Show success message with instructions
-      alert(`✅ Update saved!
-
-Project: ${selectedProject.title}
-Update: "${updateText}"
-
-📝 Note: Dashboard will be updated in your next Claude chat when you mention this project or ask to "refresh dashboard"`);
+      alert(`✅ Update saved!\n\nProject: ${selectedProject.title}\nUpdate: "${updateText}"\n\n📝 Note: Dashboard will be updated in your next Claude chat when you mention this project or ask to "refresh dashboard"`);
       
       setShowUpdateModal(false);
       setUpdateText('');
@@ -622,13 +602,7 @@ Update: "${updateText}"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  alert(`📋 Copy This Project Name:
-
-${project.claudeProjectName}
-
-1. Copy the name above
-2. Go to Claude Desktop Projects
-3. Paste in search`);
+                                  alert(`📋 Copy This Project Name:\n\n${project.claudeProjectName}\n\n1. Copy the name above\n2. Go to Claude Desktop Projects\n3. Paste in search`);
                                 }}
                                 className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors flex items-center gap-1 cursor-pointer"
                                 role="button"
@@ -703,4 +677,44 @@ ${project.claudeProjectName}
               </div>
               
               <div className="mb-4">
-                <h4 className="font-medium text-gray
+                <h4 className="font-medium text-gray-900">{selectedProject.title}</h4>
+                <p className="text-sm text-gray-600">{selectedProject.client}</p>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Project Update
+                </label>
+                <textarea
+                  value={updateText}
+                  onChange={(e) => setUpdateText(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={4}
+                  placeholder="Enter your project update..."
+                />
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setShowUpdateModal(false)}
+                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateSubmit}
+                  disabled={!updateText.trim()}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Save Update
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ClientProjectsDashboard;
