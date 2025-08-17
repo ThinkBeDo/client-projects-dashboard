@@ -1,0 +1,9 @@
+{
+  "name": "com.thinkbedo.railway.host",
+  "description": "Railway CLI native messaging host for Chrome Debug Extension",
+  "path": "railway-logs.js",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://your-extension-id-here/"
+  ]
+}
