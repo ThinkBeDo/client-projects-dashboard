@@ -1,6 +1,6 @@
 /**
- * Enhanced Background Service Worker - Chrome Debug Extension Phase 2
- * Integrates Claude formatting and basic-memory auto-save
+ * Enhanced Background Service Worker - Chrome Debug Extension with Railway Integration
+ * Now includes native messaging for Railway CLI access
  */
 
 // Import Claude integration modules
@@ -17,10 +17,14 @@ class DebugCapture {
             includeRailwayLogs: true,
             claudeMode: true
         };
+        
+        // Railway native messaging setup
+        this.railwayHostName = 'com.thinkbedo.railway.host';
+        this.railwayConnected = false;
     }
 
     /**
-     * Enhanced main capture function with Claude integration
+     * Enhanced main capture function with Railway CLI integration
      */
     async captureDebugContext(tabId, options = {}) {
         if (this.isCapturing) {
@@ -95,7 +99,7 @@ class DebugCapture {
     }
 
     /**
-     * Enhanced data gathering with better error context
+     * Enhanced data gathering with Railway CLI integration
      */
     async gatherAllDebugData(tab, options) {
         const data = {
@@ -118,9 +122,13 @@ class DebugCapture {
             this.capturePageErrors(tab.id)
         ];
 
-        // Add Railway logs if it's a Railway deployment
-        if (options.includeRailwayLogs && tab.url.includes('.up.railway.app')) {
-            tasks.push(this.captureRailwayLogs(tab.url));
+        // Enhanced Railway detection and log capture
+        if (options.includeRailwayLogs) {
+            const railwayDetection = await this.detectRailwayProject(tab.url);
+            if (railwayDetection.detected) {
+                this.updateProgress('Fetching Railway logs...', 40);
+                tasks.push(this.captureRailwayLogs(railwayDetection));
+            }
         }
 
         const results = await Promise.allSettled(tasks);
@@ -137,6 +145,191 @@ class DebugCapture {
         }
 
         return data;
+    }
+
+    /**
+     * Enhanced Railway project detection using native messaging
+     */
+    async detectRailwayProject(url) {
+        try {
+            const response = await this.sendRailwayMessage({
+                action: 'detectProject',
+                url: url
+            });
+            
+            if (response && response.success) {
+                return response.data;
+            }
+            
+            // Fallback to URL pattern matching
+            return this.fallbackRailwayDetection(url);
+            
+        } catch (error) {
+            console.warn('Railway native messaging not available, using fallback detection:', error);
+            return this.fallbackRailwayDetection(url);
+        }
+    }
+
+    /**
+     * Fallback Railway detection for when native messaging isn't available
+     */
+    fallbackRailwayDetection(url) {
+        const railwayPatterns = [
+            /https?:\/\/([^.]+)\.up\.railway\.app/,
+            /https?:\/\/railway\.app\/project\/([^\/]+)/,
+            /railway\.app.*project[\/=]([^\/&]+)/
+        ];
+
+        for (const pattern of railwayPatterns) {
+            const match = url.match(pattern);
+            if (match) {
+                return {
+                    detected: true,
+                    subdomain: match[1],
+                    url: url,
+                    type: 'railway_app',
+                    nativeMessaging: false
+                };
+            }
+        }
+
+        return {
+            detected: false,
+            url: url,
+            type: 'unknown',
+            nativeMessaging: false
+        };
+    }
+
+    /**
+     * Enhanced Railway log capture using native messaging
+     */
+    async captureRailwayLogs(railwayInfo) {
+        try {
+            if (!railwayInfo.detected) {
+                return null;
+            }
+
+            const data = {
+                projectInfo: railwayInfo,
+                logs: [],
+                status: null,
+                deployments: [],
+                timestamp: new Date().toISOString(),
+                source: 'native-messaging'
+            };
+
+            // Try to get Railway logs via native messaging
+            try {
+                const logsResponse = await this.sendRailwayMessage({
+                    action: 'getLogs',
+                    projectId: railwayInfo.subdomain,
+                    serviceId: railwayInfo.subdomain
+                });
+
+                if (logsResponse && logsResponse.success) {
+                    data.logs = logsResponse.data.logs.split('\\n').filter(line => line.trim());
+                    data.source = 'railway-cli';
+                }
+            } catch (error) {
+                console.warn('Could not fetch Railway logs:', error);
+            }
+
+            // Try to get project status
+            try {
+                const statusResponse = await this.sendRailwayMessage({
+                    action: 'getProjectStatus',
+                    projectId: railwayInfo.subdomain
+                });
+
+                if (statusResponse && statusResponse.success) {
+                    data.status = statusResponse.data.status;
+                }
+            } catch (error) {
+                console.warn('Could not fetch Railway status:', error);
+            }
+
+            // Try to get recent deployments
+            try {
+                const deploymentsResponse = await this.sendRailwayMessage({
+                    action: 'getDeployments',
+                    projectId: railwayInfo.subdomain
+                });
+
+                if (deploymentsResponse && deploymentsResponse.success) {
+                    data.deployments = deploymentsResponse.data.deployments.split('\\n').filter(line => line.trim());
+                }
+            } catch (error) {
+                console.warn('Could not fetch Railway deployments:', error);
+            }
+
+            // Add fallback info if no native messaging data
+            if (data.logs.length === 0) {
+                data.logs = [
+                    `Railway app detected: ${railwayInfo.subdomain}`,
+                    'Install Railway CLI and configure native messaging for full log access',
+                    'URL pattern detected: ' + railwayInfo.url
+                ];
+                data.source = 'url-detection';
+            }
+
+            return data;
+
+        } catch (error) {
+            console.error('Failed to capture Railway logs:', error);
+            return {
+                projectInfo: railwayInfo,
+                logs: [`Error capturing Railway logs: ${error.message}`],
+                status: 'error',
+                deployments: [],
+                timestamp: new Date().toISOString(),
+                source: 'error'
+            };
+        }
+    }
+
+    /**
+     * Send message to Railway native messaging host
+     */
+    async sendRailwayMessage(message) {
+        return new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+                reject(new Error('Railway native messaging timeout'));
+            }, 10000); // 10 second timeout
+
+            chrome.runtime.sendNativeMessage(
+                this.railwayHostName,
+                message,
+                (response) => {
+                    clearTimeout(timeoutId);
+                    
+                    if (chrome.runtime.lastError) {
+                        reject(new Error(chrome.runtime.lastError.message));
+                    } else {
+                        resolve(response);
+                    }
+                }
+            );
+        });
+    }
+
+    /**
+     * Test Railway native messaging connection
+     */
+    async testRailwayConnection() {
+        try {
+            const response = await this.sendRailwayMessage({
+                action: 'detectProject',
+                url: 'https://test.up.railway.app'
+            });
+            
+            this.railwayConnected = response && response.success !== undefined;
+            return this.railwayConnected;
+            
+        } catch (error) {
+            this.railwayConnected = false;
+            return false;
+        }
     }
 
     /**
@@ -292,35 +485,6 @@ class DebugCapture {
     }
 
     /**
-     * Railway-specific log capture
-     */
-    async captureRailwayLogs(url) {
-        try {
-            // Extract Railway app info from URL
-            const match = url.match(/https:\/\/([^.]+)\.up\.railway\.app/);
-            if (!match) return null;
-
-            const serviceName = match[1];
-            
-            // This would integrate with Railway CLI or API
-            // For now, return basic info detected from URL
-            return {
-                serviceName,
-                status: 'unknown',
-                detectedAt: new Date().toISOString(),
-                logs: [
-                    `Railway service detected: ${serviceName}`,
-                    'Railway logs require CLI integration for full access'
-                ]
-            };
-
-        } catch (error) {
-            console.error('Failed to capture Railway logs:', error);
-            return null;
-        }
-    }
-
-    /**
      * Enhanced screenshot with element highlighting
      */
     async captureScreenshot(tabId) {
@@ -443,6 +607,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true; // Keep message channel open for async response
     }
     
+    if (message.action === 'testRailwayConnection') {
+        debugCapture.testRailwayConnection()
+            .then(connected => {
+                sendResponse({ connected, railwayHostName: debugCapture.railwayHostName });
+            })
+            .catch(error => {
+                sendResponse({ connected: false, error: error.message });
+            });
+        return true;
+    }
+    
     if (message.action === 'getOptions') {
         debugCapture.getOptions()
             .then(options => sendResponse({ options }))
@@ -466,14 +641,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Extension installation/update handler
-chrome.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason === 'install') {
-        console.log('Debug Extension installed - Claude integration ready!');
+        console.log('Debug Extension installed - Railway integration ready!');
+        
+        // Test Railway connection on install
+        const railwayConnected = await debugCapture.testRailwayConnection();
+        
         chrome.notifications.create({
             type: 'basic',
             iconUrl: 'icons/icon48.png',
             title: 'Debug Extension Ready',
-            message: 'Chrome Debug Extension with Claude integration is now active!'
+            message: `Chrome Debug Extension with Railway integration is now active! ${railwayConnected ? '(Railway CLI connected)' : '(Railway CLI not found)'}`
         });
     }
 });
