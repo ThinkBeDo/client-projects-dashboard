@@ -4,6 +4,6 @@
   "path": "railway-logs.js",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://your-extension-id-here/"
+    "chrome-extension://kjmhilobhbgabjhhhoehllolonjjffoo/"
   ]
 }
