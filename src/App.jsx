@@ -67,35 +67,35 @@ const ClientProjectsDashboard = () => {
           ]
         },
         {
-          id: 'kig-michelle',
-          title: 'Michelle Melchior Compensation Package',
-          status: 'planning',
-          priority: 'Medium',
-          description: 'Determine fair compensation vs Charlotte ($126K)',
-          lastUpdate: '2025-08-13',
-          hasClaudeProject: false,
-          claudeProjectUrl: null,
+          id: 'kig-dual-compensation',
+          title: 'Dual Compensation Strategy: Charlotte & Michelle',
+          status: 'urgent',
+          priority: 'High',
+          description: 'Offer same compensation package to both Charlotte (first) and Michelle Guidry. $100K base + 2.5% revenue bonus + growth accelerators.',
+          lastUpdate: '2025-08-17',
+          hasClaudeProject: true,
+          claudeProjectName: 'KIG Michelle Guidry Compensation Email Analysis',
           tasks: [
-            { id: 't12', text: 'Research market compensation rates', completed: false },
-            { id: 't13', text: 'Set performance-based expectations', completed: false },
-            { id: 't14', text: 'Justify higher pay with revenue targets', completed: false },
-            { id: 't15', text: 'Present compensation proposal', completed: false }
+            { id: 't12', text: 'Present offer to Charlotte first (PRIORITY)', completed: false },
+            { id: 't13', text: 'Create performance metrics framework with automation KPIs', completed: false },
+            { id: 't14', text: 'Present offer to Michelle Guidry after Charlotte decision', completed: false },
+            { id: 't15', text: 'Implement automation incentive structure', completed: false }
           ]
         },
         {
           id: 'kig-charlotte',
           title: 'Charlotte Retention Strategy',
-          status: 'planning',
-          priority: 'Medium',
-          description: 'Assess departure risk & incentive package',
-          lastUpdate: '2025-08-13',
+          status: 'in-progress',
+          priority: 'High',
+          description: 'Execute retention plan - offering same package as Michelle',
+          lastUpdate: '2025-08-17',
           hasClaudeProject: false,
           claudeProjectUrl: null,
           tasks: [
-            { id: 't16', text: 'Assess if Charlotte is actually planning to leave', completed: false },
-            { id: 't17', text: 'Design incentive package to encourage staying', completed: false },
-            { id: 't18', text: 'Conduct risk assessment if she departs', completed: false },
-            { id: 't19', text: 'Create succession planning considerations', completed: false }
+            { id: 't16', text: 'Prepare Charlotte compensation offer (same as Michelle)', completed: false },
+            { id: 't17', text: 'Schedule compensation discussion with Charlotte', completed: false },
+            { id: 't18', text: 'Present complete package with growth opportunities', completed: false },
+            { id: 't19', text: 'Get Charlotte\'s decision before proceeding with Michelle', completed: false }
           ]
         }
       ]
@@ -406,7 +406,12 @@ ${updateText}
       });
 
       // Show success message with instructions
-      alert(`✅ Update saved!\n\nProject: ${selectedProject.title}\nUpdate: "${updateText}"\n\n📝 Note: Dashboard will be updated in your next Claude chat when you mention this project or ask to "refresh dashboard"`);
+      alert(`✅ Update saved!
+
+Project: ${selectedProject.title}
+Update: "${updateText}"
+
+📝 Note: Dashboard will be updated in your next Claude chat when you mention this project or ask to "refresh dashboard"`);
       
       setShowUpdateModal(false);
       setUpdateText('');
@@ -617,7 +622,13 @@ ${updateText}
                                 onClick={(e) => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  alert(`📋 Copy This Project Name:\n\n${project.claudeProjectName}\n\n1. Copy the name above\n2. Go to Claude Desktop Projects\n3. Paste in search`);
+                                  alert(`📋 Copy This Project Name:
+
+${project.claudeProjectName}
+
+1. Copy the name above
+2. Go to Claude Desktop Projects
+3. Paste in search`);
                                 }}
                                 className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors flex items-center gap-1 cursor-pointer"
                                 role="button"
@@ -692,45 +703,4 @@ ${updateText}
               </div>
               
               <div className="mb-4">
-                <h4 className="font-medium text-gray-900">{selectedProject.title}</h4>
-                <p className="text-sm text-gray-600">{selectedProject.client}</p>
-                <p className="text-sm text-gray-500 mt-1">{selectedProject.description}</p>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Project Update / Status Change / Notes
-                </label>
-                <textarea
-                  value={updateText}
-                  onChange={(e) => setUpdateText(e.target.value)}
-                  placeholder="Enter your update here... (e.g., 'Status: Waiting on client approval', 'Completed Phase 1', 'Issue: Need more requirements')"
-                  className="w-full h-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowUpdateModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdateSubmit}
-                  disabled={!updateText.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Send Update to Claude
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default ClientProjectsDashboard;
+                <h4 className="font-medium text-gray
